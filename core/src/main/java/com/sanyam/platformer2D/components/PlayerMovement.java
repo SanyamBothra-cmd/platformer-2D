@@ -31,9 +31,13 @@ public class PlayerMovement {
     private boolean onWallRight;
     private float wallJumpLockTimer;
 
-    // The level's collidable geometry — set externally by GameScreen.
-    // No longer hardcoded constants; ANY rectangle can now act as ground/wall/obstacle.
-    private List<Rectangle> solids;
+    private List<Rectangle> solids;   // full collision — ground, walls, obstacles
+    private List<Rectangle> platforms; // one-way collision — land on top only
+
+    private Rectangle currentPlatform;   // the platform currently stood on, if any (null if on solid ground or airborne)
+    private Rectangle ignoredPlatform;   // platform being actively dropped through — ignored until cleared
+
+    private float lastDownPressTime = -DOUBLE_TAP_WINDOW; // primed so the very first press can't false-trigger
 
     public PlayerMovement(Vector2 startPosition) {
         this.position = startPosition;
