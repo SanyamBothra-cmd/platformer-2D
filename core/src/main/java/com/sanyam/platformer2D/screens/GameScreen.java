@@ -76,6 +76,11 @@ public class GameScreen implements Screen {
             shapeRenderer.rect(solid.x, solid.y, solid.width, solid.height);
         }
 
+        shapeRenderer.setColor(Color.BROWN);
+        for (Rectangle platform : platforms) {
+            shapeRenderer.rect(platform.x, platform.y, platform.width, platform.height);
+        }
+        
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.rect(resetZone.x, resetZone.y, resetZone.width, resetZone.height);
 
