@@ -21,6 +21,7 @@ public class GameScreen implements Screen {
     private Player player;
 
     private List<Rectangle> solids;
+    private List<Rectangle> platforms;
     private List<ThrownWeapon> thrownWeapons;
     private Rectangle resetZone;
     private Vector2 spawnPoint;
@@ -37,10 +38,20 @@ public class GameScreen implements Screen {
 
         buildTestLevel();
         player.setSolids(solids);
+        player.setPlatforms(platforms);
     }
 
     private void buildTestLevel() {
         solids = new ArrayList<>();
+        solids.add(new Rectangle(0, -1000, 800, 1000));   // ground
+        solids.add(new Rectangle(380, 0, 40, 60));         // jump obstacle
+        solids.add(new Rectangle(560, 0, 20, 400));        // wall-jump chimney (left wall)
+        solids.add(new Rectangle(660, 0, 20, 400));        // wall-jump chimney (right wall)
+
+        platforms = new ArrayList<>();
+        platforms.add(new Rectangle(150, 150, 100, 10));   // floating platform to jump up onto / drop through
+        platforms.add(new Rectangle(300, 280, 100, 10));   // a second, higher platform to chain jumps between
+
         resetZone = new Rectangle(740, 0, 50, 40);
     }
 
@@ -63,6 +74,11 @@ public class GameScreen implements Screen {
             shapeRenderer.rect(solid.x, solid.y, solid.width, solid.height);
         }
 
+        shapeRenderer.setColor(Color.BROWN);
+        for (Rectangle platform : platforms) {
+            shapeRenderer.rect(platform.x, platform.y, platform.width, platform.height);
+        }
+
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.rect(resetZone.x, resetZone.y, resetZone.width, resetZone.height);
 
@@ -76,7 +92,6 @@ public class GameScreen implements Screen {
     }
 
     private void updateThrownWeapons(float delta) {
-        // Pull any newly-thrown weapon out of the player and add it to the world list.
         ThrownWeapon newThrow = player.collectThrownWeapon();
         if (newThrow != null) {
             thrownWeapons.add(newThrow);
@@ -88,14 +103,14 @@ public class GameScreen implements Screen {
     }
 
     private void checkWeaponPickup() {
-        if (player.hasWeapon()) return; // already holding something, can't pick up more
+        if (player.hasWeapon()) return;
 
         for (int i = 0; i < thrownWeapons.size(); i++) {
             ThrownWeapon tw = thrownWeapons.get(i);
             if (tw.isLanded() && player.getBounds().overlaps(tw.getBounds())) {
                 player.pickUp(tw.getWeapon());
                 thrownWeapons.remove(i);
-                break; // avoid mutating the list further this same frame
+                break;
             }
         }
     }

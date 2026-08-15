@@ -24,6 +24,8 @@ public class PlayerMovement {
     private static final float GROUND_ACCELERATION = 2000f;
     private static final float AIR_ACCELERATION = 500f;
 
+    private static final float DOUBLE_TAP_WINDOW = 0.3f;
+
     private Vector2 position;
     private Vector2 velocity;
     private boolean onGround;
@@ -31,20 +33,18 @@ public class PlayerMovement {
     private boolean onWallRight;
     private float wallJumpLockTimer;
 
-    private static final float DOUBLE_TAP_WINDOW = 0.3f; // seconds allowed between taps to count as a double-tap
+    private List<Rectangle> solids;
+    private List<Rectangle> platforms;
 
-    private List<Rectangle> solids;   // full collision — ground, walls, obstacles
-    private List<Rectangle> platforms; // one-way collision — land on top only
+    private Rectangle currentPlatform;
+    private Rectangle ignoredPlatform;
 
-    private Rectangle currentPlatform;   // the platform currently stood on, if any (null if on solid ground or airborne)
-    private Rectangle ignoredPlatform;   // platform being actively dropped through — ignored until cleared
-
-    private float lastDownPressTime = -DOUBLE_TAP_WINDOW; // primed so the very first press can't false-trigger
-
+    private float lastDownPressTime = -DOUBLE_TAP_WINDOW;
 
     public PlayerMovement(Vector2 startPosition) {
         this.position = startPosition;
         this.velocity = new Vector2(0, 0);
+        this.onGround = false;
         this.onWallLeft = false;
         this.onWallRight = false;
         this.wallJumpLockTimer = 0f;
@@ -54,12 +54,18 @@ public class PlayerMovement {
         this.solids = solids;
     }
 
+    public void setPlatforms(List<Rectangle> platforms) {
+        this.platforms = platforms;
+    }
+
     public void update(float delta) {
         tickTimers(delta);
         handleInput(delta);
+        handleDropThrough();
         applyGravity(delta);
         moveX(delta);
         moveY(delta);
+        clearIgnoredPlatformIfClear();
     }
 
     private void tickTimers(float delta) {
@@ -116,6 +122,25 @@ public class PlayerMovement {
         }
     }
 
+    private void handleDropThrough() {
+        boolean downJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.S)
+            || Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
+
+        if (!downJustPressed) return;
+
+        float now = (float) System.nanoTime() / 1_000_000_000f;
+
+        if (now - lastDownPressTime <= DOUBLE_TAP_WINDOW) {
+            if (currentPlatform != null) {
+                ignoredPlatform = currentPlatform;
+                currentPlatform = null;
+                onGround = false;
+            }
+        }
+
+        lastDownPressTime = now;
+    }
+
     private float moveTowards(float current, float target, float maxDelta) {
         if (Math.abs(target - current) <= maxDelta) {
             return target;
@@ -157,9 +182,13 @@ public class PlayerMovement {
     }
 
     private void moveY(float delta) {
+        float previousBottom = position.y;
+
         position.y += velocity.y * delta;
         onGround = false;
+        currentPlatform = null;
 
+        if (solids != null) {
             for (Rectangle solid : solids) {
                 if (getBounds().overlaps(solid)) {
                     if (velocity.y < 0) {
@@ -173,6 +202,32 @@ public class PlayerMovement {
             }
         }
 
+        if (platforms != null) {
+            for (Rectangle platform : platforms) {
+                if (platform == ignoredPlatform) continue;
+
+                boolean wasAboveTop = previousBottom >= platform.y + platform.height;
+                boolean fallingIntoIt = velocity.y < 0 && getBounds().overlaps(platform);
+
+                if (wasAboveTop && fallingIntoIt) {
+                    position.y = platform.y + platform.height;
+                    velocity.y = 0;
+                    onGround = true;
+                    currentPlatform = platform;
+                }
+            }
+        }
+    }
+
+    private void clearIgnoredPlatformIfClear() {
+        if (ignoredPlatform == null) return;
+
+        boolean stillOverlapping = getBounds().overlaps(ignoredPlatform);
+        if (!stillOverlapping) {
+            ignoredPlatform = null;
+        }
+    }
+
     public Rectangle getBounds() {
         return new Rectangle(position.x, position.y, WIDTH, HEIGHT);
     }
@@ -184,6 +239,8 @@ public class PlayerMovement {
         onWallLeft = false;
         onWallRight = false;
         wallJumpLockTimer = 0f;
+        currentPlatform = null;
+        ignoredPlatform = null;
     }
 
     public Vector2 getPosition() { return position; }

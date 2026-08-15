@@ -105,6 +105,10 @@ public class Player {
         return movement.getBounds();
     }
 
+    public void setPlatforms(List<Rectangle> platforms) {
+        movement.setPlatforms(platforms);
+    }
+
     public void reset(Vector2 position) {
         movement.reset(position);
     }
