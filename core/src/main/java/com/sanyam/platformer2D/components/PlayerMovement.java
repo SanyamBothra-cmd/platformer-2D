@@ -164,22 +164,19 @@ public class PlayerMovement {
         position.y += velocity.y * delta;
         onGround = false;
 
-        if (solids == null) return;
-
-        for (Rectangle solid : solids) {
-            if (getBounds().overlaps(solid)) {
-                if (velocity.y < 0) {
-                    // Falling, landed on top of a solid.
-                    position.y = solid.y + solid.height;
-                    onGround = true;
-                } else if (velocity.y > 0) {
-                    // Jumping, hit a ceiling.
-                    position.y = solid.y - HEIGHT;
+        if (solids != null) {
+            for (Rectangle solid : solids) {
+                if (getBounds().overlaps(solid)) {
+                    if (velocity.y < 0) {
+                        position.y = solid.y + solid.height;
+                        onGround = true;
+                    } else if (velocity.y > 0) {
+                        position.y = solid.y - HEIGHT;
+                    }
+                    velocity.y = 0;
                 }
-                velocity.y = 0;
             }
         }
-    }
 
         if (platforms != null) {
             for (Rectangle platform : platforms) {
