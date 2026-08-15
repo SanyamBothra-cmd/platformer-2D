@@ -110,6 +110,29 @@ public class PlayerMovement {
         }
     }
 
+    // Double-tap detection for S/Down. Uses the same "record a timestamp, compare
+    // against a threshold on the next press" approach as the wall-jump lockout timer,
+    // just applied to elapsed real time instead of a countdown.
+    private void handleDropThrough() {
+        boolean downJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.S)
+            || Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
+
+        if (!downJustPressed) return;
+
+        float now = (float) System.nanoTime() / 1_000_000_000f;
+
+        if (now - lastDownPressTime <= DOUBLE_TAP_WINDOW) {
+            // Second press arrived within the window — this is a double-tap.
+            if (currentPlatform != null) {
+                ignoredPlatform = currentPlatform;
+                currentPlatform = null;
+                onGround = false; // we're about to fall through, so we're no longer grounded
+            }
+        }
+
+        lastDownPressTime = now;
+    }
+
     private float moveTowards(float current, float target, float maxDelta) {
         if (Math.abs(target - current) <= maxDelta) {
             return target;
