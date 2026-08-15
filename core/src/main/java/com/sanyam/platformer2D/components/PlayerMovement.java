@@ -156,6 +156,11 @@ public class PlayerMovement {
 
     // --- Collision: vertical axis ---
     private void moveY(float delta) {
+        // Capture the bottom edge BEFORE moving — this is the key value that lets
+        // us tell "was I already above this platform" apart from "did I just jump
+        // up into it from below."
+        float previousBottom = position.y;
+
         position.y += velocity.y * delta;
         onGround = false;
 
