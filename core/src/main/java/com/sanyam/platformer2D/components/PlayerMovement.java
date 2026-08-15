@@ -175,7 +175,6 @@ public class PlayerMovement {
         for (Rectangle solid : solids) {
             if (getBounds().overlaps(solid)) {
                 if (velocity.x > 0) {
-                    // Moving right, hit a solid's left edge — snap to just outside it.
                     position.x = solid.x - WIDTH;
                     onWallRight = true;
                 } else if (velocity.x < 0) {
