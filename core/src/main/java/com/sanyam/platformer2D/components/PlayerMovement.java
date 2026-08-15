@@ -24,6 +24,8 @@ public class PlayerMovement {
     private static final float GROUND_ACCELERATION = 2000f;
     private static final float AIR_ACCELERATION = 500f;
 
+    private static final float DOUBLE_TAP_WINDOW = 0.3f; // seconds allowed between taps to count as a double-tap
+
     private Vector2 position;
     private Vector2 velocity;
     private boolean onGround;
@@ -187,7 +189,6 @@ public class PlayerMovement {
         // collide vertically (from above), never block horizontal movement.
     }
 
-    // --- Collision: vertical axis ---
     private void moveY(float delta) {
         // Capture the bottom edge BEFORE moving — this is the key value that lets
         // us tell "was I already above this platform" apart from "did I just jump
