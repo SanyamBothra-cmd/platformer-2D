@@ -55,6 +55,7 @@ public class PlayerMovement {
     public void update(float delta) {
         tickTimers(delta);
         handleInput(delta);
+        handleDropThrough();
         applyGravity(delta);
         moveX(delta);
         moveY(delta);
