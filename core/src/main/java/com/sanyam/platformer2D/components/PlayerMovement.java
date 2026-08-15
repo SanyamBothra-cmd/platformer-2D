@@ -150,6 +150,8 @@ public class PlayerMovement {
                 velocity.x = 0;
             }
         }
+        // Note: platforms are intentionally NOT checked here — they only ever
+        // collide vertically (from above), never block horizontal movement.
     }
 
     // --- Collision: vertical axis ---
