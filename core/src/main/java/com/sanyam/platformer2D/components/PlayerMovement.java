@@ -1,9 +1,10 @@
 package com.sanyam.platformer2D.components;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.sanyam.platformer2D.input.GameAction;
+import com.sanyam.platformer2D.input.KeyBindings;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class PlayerMovement {
     private static final float AIR_ACCELERATION = 500f;
 
     private static final float DOUBLE_TAP_WINDOW = 0.3f;
+    private static final float VOID_DEATH_Y = -500f; // Fix 2
 
     private Vector2 position;
     private Vector2 velocity;
@@ -33,6 +35,8 @@ public class PlayerMovement {
     private boolean onWallRight;
     private float wallJumpLockTimer;
 
+    private KeyBindings keyBindings;
+
     private List<Rectangle> solids;
     private List<Rectangle> platforms;
 
@@ -40,14 +44,16 @@ public class PlayerMovement {
     private Rectangle ignoredPlatform;
 
     private float lastDownPressTime = -DOUBLE_TAP_WINDOW;
+    private boolean fellIntoVoid;
 
-    public PlayerMovement(Vector2 startPosition) {
+    public PlayerMovement(Vector2 startPosition, KeyBindings keyBindings) {
         this.position = startPosition;
         this.velocity = new Vector2(0, 0);
         this.onGround = false;
         this.onWallLeft = false;
         this.onWallRight = false;
         this.wallJumpLockTimer = 0f;
+        this.keyBindings = keyBindings;
     }
 
     public void setSolids(List<Rectangle> solids) {
@@ -66,6 +72,7 @@ public class PlayerMovement {
         moveX(delta);
         moveY(delta);
         clearIgnoredPlatformIfClear();
+        checkVoidDeath();
     }
 
     private void tickTimers(float delta) {
@@ -80,10 +87,10 @@ public class PlayerMovement {
         if (!locked) {
             float targetVelocityX = 0f;
 
-            if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (Gdx.input.isKeyPressed(keyBindings.getKey(GameAction.MOVE_LEFT))) {
                 targetVelocityX = -MOVE_SPEED;
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            if (Gdx.input.isKeyPressed(keyBindings.getKey(GameAction.MOVE_RIGHT))) {
                 targetVelocityX = MOVE_SPEED;
             }
 
@@ -91,9 +98,9 @@ public class PlayerMovement {
             velocity.x = moveTowards(velocity.x, targetVelocityX, acceleration * delta);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            boolean holdingLeft = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
-            boolean holdingRight = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+        if (Gdx.input.isKeyPressed(keyBindings.getKey(GameAction.JUMP))) {
+            boolean holdingLeft = Gdx.input.isKeyPressed(keyBindings.getKey(GameAction.MOVE_LEFT));
+            boolean holdingRight = Gdx.input.isKeyPressed(keyBindings.getKey(GameAction.MOVE_RIGHT));
 
             if (onGround) {
                 velocity.y = JUMP_VELOCITY;
@@ -123,9 +130,7 @@ public class PlayerMovement {
     }
 
     private void handleDropThrough() {
-        boolean downJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.S)
-            || Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
-
+        boolean downJustPressed = Gdx.input.isKeyJustPressed(keyBindings.getKey(GameAction.DROP_THROUGH));
         if (!downJustPressed) return;
 
         float now = (float) System.nanoTime() / 1_000_000_000f;
@@ -152,7 +157,6 @@ public class PlayerMovement {
         if (onGround) {
             return;
         }
-
         if ((onWallLeft || onWallRight) && velocity.y < 0) {
             velocity.y = Math.max(velocity.y + GRAVITY * delta, WALL_SLIDE_SPEED);
         } else {
@@ -221,11 +225,21 @@ public class PlayerMovement {
 
     private void clearIgnoredPlatformIfClear() {
         if (ignoredPlatform == null) return;
-
-        boolean stillOverlapping = getBounds().overlaps(ignoredPlatform);
-        if (!stillOverlapping) {
+        if (!getBounds().overlaps(ignoredPlatform)) {
             ignoredPlatform = null;
         }
+    }
+
+    private void checkVoidDeath() {
+        if (position.y < VOID_DEATH_Y) {
+            fellIntoVoid = true;
+        }
+    }
+
+    public boolean consumeVoidDeath() {
+        boolean result = fellIntoVoid;
+        fellIntoVoid = false;
+        return result;
     }
 
     public Rectangle getBounds() {
@@ -241,6 +255,7 @@ public class PlayerMovement {
         wallJumpLockTimer = 0f;
         currentPlatform = null;
         ignoredPlatform = null;
+        fellIntoVoid = false;
     }
 
     public Vector2 getPosition() { return position; }
