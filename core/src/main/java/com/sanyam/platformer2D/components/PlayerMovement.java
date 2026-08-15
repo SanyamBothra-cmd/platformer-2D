@@ -58,6 +58,7 @@ public class PlayerMovement {
         applyGravity(delta);
         moveX(delta);
         moveY(delta);
+        clearIgnoredPlatformIfClear();
     }
 
     private void tickTimers(float delta) {
