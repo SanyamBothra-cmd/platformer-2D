@@ -164,7 +164,6 @@ public class PlayerMovement {
         }
     }
 
-    // --- Collision: horizontal axis ---
     private void moveX(float delta) {
         position.x += velocity.x * delta;
         onWallLeft = false;
