@@ -216,6 +216,8 @@ public class PlayerMovement {
         onWallLeft = false;
         onWallRight = false;
         wallJumpLockTimer = 0f;
+        currentPlatform = null;
+        ignoredPlatform = null;
     }
 
     public Vector2 getPosition() { return position; }
