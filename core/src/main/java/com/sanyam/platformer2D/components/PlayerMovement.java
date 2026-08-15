@@ -163,6 +163,7 @@ public class PlayerMovement {
 
         position.y += velocity.y * delta;
         onGround = false;
+        currentPlatform = null;
 
         if (solids != null) {
             for (Rectangle solid : solids) {
