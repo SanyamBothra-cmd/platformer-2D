@@ -174,6 +174,35 @@ public class PlayerMovement {
         }
     }
 
+        if (platforms != null) {
+            for (Rectangle platform : platforms) {
+                if (platform == ignoredPlatform) continue; // actively dropping through this one
+
+                boolean wasAboveTop = previousBottom >= platform.y + platform.height;
+                boolean fallingIntoIt = velocity.y < 0 && getBounds().overlaps(platform);
+
+                if (wasAboveTop && fallingIntoIt) {
+                    position.y = platform.y + platform.height;
+                    velocity.y = 0;
+                    onGround = true;
+                    currentPlatform = platform;
+                }
+            }
+        }
+    }
+
+    // Once the player has genuinely fallen clear of the platform they were
+    // dropping through, stop ignoring it — otherwise it would stay permanently
+    // passable, which isn't what "drop through" should mean.
+    private void clearIgnoredPlatformIfClear() {
+        if (ignoredPlatform == null) return;
+
+        boolean stillOverlapping = getBounds().overlaps(ignoredPlatform);
+        if (!stillOverlapping) {
+            ignoredPlatform = null;
+        }
+    }
+
     public Rectangle getBounds() {
         return new Rectangle(position.x, position.y, WIDTH, HEIGHT);
     }
