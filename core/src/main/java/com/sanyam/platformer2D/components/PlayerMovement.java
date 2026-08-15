@@ -48,6 +48,10 @@ public class PlayerMovement {
         this.solids = solids;
     }
 
+    public void setPlatforms(List<Rectangle> platforms) {
+        this.platforms = platforms;
+    }
+
     public void update(float delta) {
         tickTimers(delta);
         handleInput(delta);
