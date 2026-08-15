@@ -42,7 +42,7 @@ public class PlayerMovement {
     public PlayerMovement(Vector2 startPosition) {
         this.position = startPosition;
         this.velocity = new Vector2(0, 0);
-        this.onGround = false; // no longer assumed — gravity + collision determine this now
+        this.onGround = false;
         this.onWallLeft = false;
         this.onWallRight = false;
         this.wallJumpLockTimer = 0f;
