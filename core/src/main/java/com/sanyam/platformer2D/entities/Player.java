@@ -101,10 +101,6 @@ public class Player {
         }
     }
 
-    public void setPlatforms(List<Rectangle> platforms) {
-        movement.setPlatforms(platforms);
-    }
-
     public Rectangle getBounds() {
         return movement.getBounds();
     }

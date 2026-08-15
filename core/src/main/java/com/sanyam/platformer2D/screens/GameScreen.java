@@ -20,7 +20,6 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private Player player;
 
-    private List<Rectangle> platforms;
     private List<Rectangle> solids;
     private List<ThrownWeapon> thrownWeapons;
     private Rectangle resetZone;
@@ -28,10 +27,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
-        player.setSolids(solids);
-        player.setPlatforms(platforms);
-
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         shapeRenderer = new ShapeRenderer();
@@ -46,14 +41,6 @@ public class GameScreen implements Screen {
 
     private void buildTestLevel() {
         solids = new ArrayList<>();
-        solids.add(new Rectangle(0, -1000, 800, 1000));       // ground
-        solids.add(new Rectangle(380, 0, 40, 60));             // jump obstacle
-        solids.add(new Rectangle(560, 0, 20, 400));            // wall-jump chimney (left)
-        solids.add(new Rectangle(660, 0, 20, 400));            // wall-jump chimney (right)
-
-        platforms = new ArrayList<>();
-        platforms.add(new Rectangle(150, 150, 100, 10));       // a floating platform, thin — jump up onto it, S+S to drop
-
         resetZone = new Rectangle(740, 0, 50, 40);
     }
 
@@ -74,11 +61,6 @@ public class GameScreen implements Screen {
         shapeRenderer.setColor(Color.GRAY);
         for (Rectangle solid : solids) {
             shapeRenderer.rect(solid.x, solid.y, solid.width, solid.height);
-        }
-
-        shapeRenderer.setColor(Color.BROWN);
-        for (Rectangle platform : platforms) {
-            shapeRenderer.rect(platform.x, platform.y, platform.width, platform.height);
         }
 
         shapeRenderer.setColor(Color.GREEN);
