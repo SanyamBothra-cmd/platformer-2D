@@ -46,10 +46,14 @@ public class GameScreen implements Screen {
 
     private void buildTestLevel() {
         solids = new ArrayList<>();
-        solids.add(new Rectangle(0, -1000, 800, 1000));
-        solids.add(new Rectangle(380, 0, 40, 60));
-        solids.add(new Rectangle(560, 0, 20, 400));
-        solids.add(new Rectangle(660, 0, 20, 400));
+        solids.add(new Rectangle(0, -1000, 800, 1000));       // ground
+        solids.add(new Rectangle(380, 0, 40, 60));             // jump obstacle
+        solids.add(new Rectangle(560, 0, 20, 400));            // wall-jump chimney (left)
+        solids.add(new Rectangle(660, 0, 20, 400));            // wall-jump chimney (right)
+
+        platforms = new ArrayList<>();
+        platforms.add(new Rectangle(150, 150, 100, 10));       // a floating platform, thin — jump up onto it, S+S to drop
+
         resetZone = new Rectangle(740, 0, 50, 40);
     }
 
