@@ -28,6 +28,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+
+        player.setSolids(solids);
+        player.setPlatforms(platforms);
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         shapeRenderer = new ShapeRenderer();
