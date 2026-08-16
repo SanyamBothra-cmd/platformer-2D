@@ -37,7 +37,7 @@ This is also a **learning-oriented project** — it's being built incrementally,
 | JDK | 21 LTS |
 | IDE | IntelliJ IDEA |
 | Target platform | Desktop (Windows/Mac/Linux) — mobile deferred until desktop build is stable |
-| Level editor | [Tiled](https://www.mapeditor.org/) |
+| Level editor | [LDtk](https://ldtk.io) |
 | Sprite packing | TexturePacker |
 
 ---
