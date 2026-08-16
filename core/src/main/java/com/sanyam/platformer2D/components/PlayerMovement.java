@@ -10,22 +10,22 @@ import java.util.List;
 
 public class PlayerMovement {
 
-    private static final float WIDTH = 32f;
-    private static final float HEIGHT = 48f;
+    private final float width;
+    private final float height;
 
-    private static final float MOVE_SPEED = 200f;
-    private static final float GRAVITY = -900f;
-    private static final float JUMP_VELOCITY = 450f;
+    private static final float MOVE_SPEED = 75f;        // was 200
+    private static final float GRAVITY = -337.5f;         // was -900
+    private static final float JUMP_VELOCITY = 168.75f;   // was 450
 
-    private static final float WALL_SLIDE_SPEED = -100f;
-    private static final float WALL_JUMP_VELOCITY_X = 150f;
-    private static final float WALL_JUMP_VELOCITY_Y = 350f;
-    private static final float WALL_JUMP_LOCK_DURATION = 0.25f;
+    private static final float WALL_SLIDE_SPEED = -37.5f;      // was -100
+    private static final float WALL_JUMP_VELOCITY_X = 56.25f;  // was 150
+    private static final float WALL_JUMP_VELOCITY_Y = 131.25f; // was 350
+    private static final float WALL_JUMP_LOCK_DURATION = 0.25f; // unchanged — time, not distance
 
-    private static final float GROUND_ACCELERATION = 2000f;
-    private static final float AIR_ACCELERATION = 500f;
+    private static final float GROUND_ACCELERATION = 750f;  // was 2000
+    private static final float AIR_ACCELERATION = 187.5f;   // was 500
 
-    private static final float DOUBLE_TAP_WINDOW = 0.3f;
+    private static final float DOUBLE_TAP_WINDOW = 0.3f; // unchanged — time, not distance
     private static final float VOID_DEATH_Y = -500f; // Fix 2
 
     private Vector2 position;
@@ -46,7 +46,7 @@ public class PlayerMovement {
     private float lastDownPressTime = -DOUBLE_TAP_WINDOW;
     private boolean fellIntoVoid;
 
-    public PlayerMovement(Vector2 startPosition, KeyBindings keyBindings) {
+    public PlayerMovement(Vector2 startPosition, KeyBindings keyBindings, float width, float height) {
         this.position = startPosition;
         this.velocity = new Vector2(0, 0);
         this.onGround = false;
@@ -54,6 +54,8 @@ public class PlayerMovement {
         this.onWallRight = false;
         this.wallJumpLockTimer = 0f;
         this.keyBindings = keyBindings;
+        this.width = width;
+        this.height = height;
     }
 
     public void setSolids(List<Rectangle> solids) {
@@ -174,7 +176,7 @@ public class PlayerMovement {
         for (Rectangle solid : solids) {
             if (getBounds().overlaps(solid)) {
                 if (velocity.x > 0) {
-                    position.x = solid.x - WIDTH;
+                    position.x = solid.x - width;
                     onWallRight = true;
                 } else if (velocity.x < 0) {
                     position.x = solid.x + solid.width;
@@ -199,7 +201,7 @@ public class PlayerMovement {
                         position.y = solid.y + solid.height;
                         onGround = true;
                     } else if (velocity.y > 0) {
-                        position.y = solid.y - HEIGHT;
+                        position.y = solid.y - height;
                     }
                     velocity.y = 0;
                 }
@@ -243,7 +245,7 @@ public class PlayerMovement {
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(position.x, position.y, WIDTH, HEIGHT);
+        return new Rectangle(position.x, position.y, width, height);
     }
 
     public void reset(Vector2 newPosition) {

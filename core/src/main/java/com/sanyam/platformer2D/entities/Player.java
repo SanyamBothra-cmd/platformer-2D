@@ -16,19 +16,20 @@ import java.util.List;
 
 public class Player {
 
+    private static final float WIDTH = 10f;
+    private static final float HEIGHT = 18f;
+
     private PlayerMovement movement;
     private Inventory inventory;
     private KeyBindings keyBindings;
     private boolean facingRight;
-
     private ThrownWeapon pendingThrow;
 
     public Player(Vector2 startPosition, KeyBindings keyBindings) {
         this.keyBindings = keyBindings;
-        this.movement = new PlayerMovement(startPosition, keyBindings);
+        this.movement = new PlayerMovement(startPosition, keyBindings, WIDTH, HEIGHT); // pass size in
         this.inventory = new Inventory();
         this.facingRight = true;
-
         inventory.equip(new Sword());
     }
 
@@ -97,8 +98,10 @@ public class Player {
         if (inventory.hasWeapon()) {
             Weapon weapon = inventory.getEquippedWeapon();
             shapeRenderer.setColor(weapon.getColor());
-            float iconX = facingRight ? bounds.x + bounds.width : bounds.x - 12;
-            shapeRenderer.rect(iconX, bounds.y + bounds.height / 2, 12, 4);
+            float iconWidth = 4f;
+            float iconHeight = 2f;
+            float iconX = facingRight ? bounds.x + bounds.width : bounds.x - iconWidth;
+            shapeRenderer.rect(iconX, bounds.y + bounds.height / 2, iconWidth, iconHeight);
         }
     }
 

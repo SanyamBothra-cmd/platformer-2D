@@ -13,6 +13,7 @@ import com.sanyam.platformer2D.MainGame;
 import com.sanyam.platformer2D.entities.Player;
 import com.sanyam.platformer2D.entities.ThrownWeapon;
 import com.sanyam.platformer2D.input.KeyBindings;
+import com.sanyam.platformer2D.world.LevelLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,33 +42,32 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(null); // gameplay uses raw polling, not a Stage
+        Gdx.input.setInputProcessor(null);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 600);
         shapeRenderer = new ShapeRenderer();
 
-        spawnPoint = new Vector2(50, 100);
-        player = new Player(spawnPoint.cpy(), keyBindings);
         thrownWeapons = new ArrayList<>();
 
-        buildTestLevel();
+        buildTestLevel(); // now sets spawnPoint too — must run before creating Player
+
+        player = new Player(spawnPoint.cpy(), keyBindings);
         player.setSolids(solids);
         player.setPlatforms(platforms);
     }
 
     private void buildTestLevel() {
-        solids = new ArrayList<>();
-        solids.add(new Rectangle(0, -1000, 800, 1000));
-        solids.add(new Rectangle(380, 0, 40, 60));
-        solids.add(new Rectangle(560, 0, 20, 400));
-        solids.add(new Rectangle(660, 0, 20, 400));
+        LevelLoader.LevelData levelData = LevelLoader.load("maps/TestMap.ldtk");
+        solids = levelData.solids;
+        platforms = levelData.platforms;
 
-        platforms = new ArrayList<>();
-        platforms.add(new Rectangle(150, 150, 100, 10));
-        platforms.add(new Rectangle(300, 280, 100, 10));
+        // Spawn near the far-left edge, high up — gravity carries the player
+        // down onto whatever ground is there. The small x-offset keeps the
+        // player from spawning INSIDE a left-edge wall, if one exists.
+        spawnPoint = new Vector2(20, levelData.pixelHeight - 20);
 
-        resetZone = new Rectangle(740, 0, 50, 40);
+        resetZone = new Rectangle(740, 0, 50, 40); // reposition/remove once you've placed this deliberately in LDtk
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ThrownWeapon {
 
-    private static final float SIZE = 16f;
+    private static final float SIZE = 6f;
     private static final float BASE_GRAVITY = -900f; // shared baseline; each weapon scales it
 
     private Vector2 position;
